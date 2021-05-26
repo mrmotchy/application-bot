@@ -14,7 +14,8 @@
 [![Setup](http://i.imgur.com/VvXYp5j.png)](https://www.youtube.com/channel/UCmkPzf-eAJsiuCh-5kz4Abw)
 
 ## Features
-  * Easy to run 
+  * **Watch my YT video & host your bot 24/7**
+  * Easy to run
   * Fast loading
   * No external keys needed (besides a Discord Bot token)
   * Smooth application
