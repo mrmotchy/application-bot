@@ -36,6 +36,6 @@
  ### Click [here](https://www.youtube.com/channel/UCmkPzf-eAJsiuCh-5kz4Abw) to watch my YouTube video !
 
 
- ### Click [here]https://dsc.gg/dst74) to join my discord server !
+ ### Click [here](https://dsc.gg/dst74) to join my discord server !
 
 ![](https://github.com/mrmotchy/stuff/blob/main/Bild_2021-05-26_224505.png?raw=true)
