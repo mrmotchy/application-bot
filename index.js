@@ -12,6 +12,7 @@ client.login(process.env.TOKEN);
 
 
 const config = require('./config.json')
+const Discord = require('discord.js')
 
 client.on('ready', () => {
     console.log(`${client.user.tag} is online!`)
