@@ -1,23 +1,19 @@
-
-const { Client } = require("discord.js");
-const keepAlive = require('./server.js');
- 
+const { Client, Discord, MessageEmbed } = require("discord.js");
+const config = require('./config.json')
 const client = new Client({
   disableEveryone: true
 });
- 
-keepAlive();
-client.login(process.env.TOKEN);
-
-
-
-const config = require('./config.json')
-const Discord = require('discord.js')
+require('./server.js');
 
 client.on('ready', () => {
     console.log(`${client.user.tag} is online!`)
-
 })
+
+let count = 0
+let answer = []
+
+process.on('unhandledRejection', error => console.log(error));
+process.on('uncaughtException', error => console.log(error));
 
 client.on('message', async message => {
 
@@ -25,81 +21,34 @@ client.on('message', async message => {
     let command = args.shift().toLowerCase()
 
 
-    let questions = {
-        firstQuestion: "Are you familiar with Github ?  ``Yes/No``",
-        secondQuestion: "How long are you online a day ?",
-        thirdQuestion: "When you get stuck on a problem, what do you do ?",
-        fourthQuestion: "How old are you ?",
-        fifthQuestion: "Are you ready to work in a team and move it forward in a meaningful way ?  ``Yes/No``",
-    }
+    let questions = [
+        { question: "Are you familiar with Github ?  ``Yes/No``" },
+        { question: "How long are you online a day ?" },
+        { question: "When you get stuck on a problem, what do you do ?" },
+        { question: "How old are you ?" },
+        { question: "Are you ready to work in a team and move it forward in a meaningful way ?  ``Yes/No``" },
+    ]
 
 
     if (!message.content.startsWith(config.prefix) || message.author.bot) return
     if (command === "apply") {
-        message.channel.send("I have started this process in your DM's. Type `cancel` to cancel")
-        message.author.send(questions.firstQuestion).then(msg => {
+        for (let i = 0; i < questions.length; i++) {
+            const send = await message.author.send(questions[i].question)
             const filter1 = m => m.author.id === message.author.id
-            msg.channel.awaitMessages(filter1, {
-                time: 5 * 60000,
-                max: 1
-            }).then(messages => {
-                let msg1 = messages.first().content
-                if(msg1.toLowerCase() === "cancel") return message.author.send("Ok, I have cancelled this process")
-                message.author.send(questions.secondQuestion).then(msg => {
-                    const filter1 = m => m.author.id === message.author.id
-                    msg.channel.awaitMessages(filter1, {
-                        time: 5 * 60000,
-                        max: 1
-                    }).then(messages => {
-                        let msg2 = messages.first().content
-                        if(msg2.toLowerCase() === "cancel") return message.author.send("Ok, I have cancelled this process")
-                        message.author.send(questions.thirdQuestion).then(msg => {
-                            const filter1 = m => m.author.id === message.author.id
-                            msg.channel.awaitMessages(filter1, {
-                                time: 5 * 60000,
-                                max: 1
-                            }).then(messages => {
-                                let msg3 = messages.first().content
-                                if(msg3.toLowerCase() === "cancel") return message.author.send("Ok, I have cancelled this process")
-                                message.author.send(questions.fourthQuestion).then(msg => {
-                                    const filter1 = m => m.author.id === message.author.id
-                                    msg.channel.awaitMessages(filter1, {
-                                        time: 5 * 60000,
-                                        max: 1
-                                    }).then(messages => {
-                                        let msg4 = messages.first().content
-                                        if(msg4.toLowerCase() === "cancel") return message.author.send("Ok, I have cancelled this process")
-                                        message.author.send(questions.fifthQuestion).then(msg => {
-                                            const filter1 = m => m.author.id === message.author.id
-                                            msg.channel.awaitMessages(filter1, {
-                                                time: 5 * 60000,
-                                                max: 1
-                                            }).then(messages => {
-                                                let msg5 = messages.first().content
-                                                if(msg5.toLowerCase() === "cancel") return message.author.send("Ok, I have cancelled this process")
-                                                message.author.send("Subbmitted application! ``made by captain motchy``").then(msg => {
-                                                    message.client.channels.cache.get(config.applicationChannel).send(
-                                                        new Discord.MessageEmbed()
-                                                            .setTitle('Application Submitted')
-                                                            .setDescription(`This application was submitted by ${message.author.tag} (${message.author.id}).\nCreated: ${message.author.createdAt}`)
-                                                            .addField(questions.firstQuestion, "Answer: " + msg1)
-                                                            .addField(questions.secondQuestion, "Answer: " + msg2)
-                                                            .addField(questions.thirdQuestion, "Answer: " + msg3)
-                                                            .addField(questions.fourthQuestion, "Answer: " + msg4)
-                                                            .addField(questions.fifthQuestion, "Answer: " + msg5)
-                                                    )
-                                                })
-                                            })
-                                        })
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    }
+            const res = await send.channel.awaitMessages(filter1, { time: 5 * 60000, max: 1 })
+            const msg = await res.first().content
+            if (msg !== undefined || null) count++
+            answer.push(msg)
+            if (count == questions.length) {
+                message.author.send("Subbmitted application! ``Made by RainyXeon``")
+                const embed = new MessageEmbed()
+                    .setTitle('Application Submitted')
+                    .setDescription(`This application was submitted by ${message.author.tag} (${message.author.id}).\nCreated: ${message.author.createdAt}`)
+                for (let i = 0; i < questions.length; i++) embed.addField(questions[i].question, `Answer: \`${answer[i]}\``)
+                message.client.channels.cache.get(config.applicationChannel).send(embed)
+            }
+        }
+    } 
 
     if(command === "decline"){
         if(!message.member.hasPermission("ADMINISTRATOR")) return message.channel.send("you dont' have permission to use this command")
@@ -116,4 +65,4 @@ client.on('message', async message => {
     }
 })
 
-client.login(config.token)
+client.login(config.token || process.env.TOKEN)
